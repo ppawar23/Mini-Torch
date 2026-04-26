@@ -6,8 +6,9 @@ class Linear(Module):
     """
     A fully connected linear layer: y = x @ W.T + b
 
-    Implements the Perceptron Learning Rule in backward() for direct
-    weight updates without a separate Optimizer.
+    Stores parameter gradients during backward() for Optimizer-based updates.
+
+    Note: Updated this one for optimizer based updates
     """
 
     def __init__(self, in_features, out_features):
@@ -17,7 +18,8 @@ class Linear(Module):
             out_features (int): Number of output neurons (e.g., 10 for digits).
         """
         super().__init__()
-        self.W = np.random.randn(out_features, in_features).astype(np.float32) * 0.01
+        scale = np.sqrt(1.0 / in_features)
+        self.W = (np.random.randn(out_features, in_features).astype(np.float32) * scale)
         self.b = np.zeros((1, out_features), dtype=np.float32)
         self.x = None
         self.dW = np.zeros_like(self.W)
@@ -39,26 +41,22 @@ class Linear(Module):
 
     def backward(self, error):
         """
-        Applies the Perceptron Learning Rule.
-
-        For each sample, update:
-            W += error.T @ x
-            b += error
+        Backward pass for a linear layer.
 
         Args:
-            error (numpy.ndarray): Error signal (target - prediction),
+            error (numpy.ndarray): Gradient w.r.t. output,
                                    shape (batch_size, out_features).
         Returns:
             numpy.ndarray: Gradient w.r.t. input (for deeper networks).
         """
         self.dW = error.T @ self.x
         self.db = np.sum(error, axis=0, keepdims=True)
-
-        # Directly update weights (no optimizer needed for perceptron)
-        self.W += self.dW
-        self.b += self.db
-
         return error @ self.W
+    # end method
+    #added these lines
+    def zero_grad(self):
+        self.dW.fill(0.0)
+        self.db.fill(0.0)
     # end method
 
     def parameters(self):
