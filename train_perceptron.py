@@ -9,7 +9,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-from MNISTDataset import MNISTDataset
+from examples.MNISTDataset import MNISTDataset
 from DataLoader import DataLoader
 from Linear import Linear
 from Threshold import Threshold
